@@ -71,10 +71,10 @@ if __name__ == "__main__":
         from FilePickerPyto import FilePickerPyto
 
         csv_path = FilePickerPyto(
-            file_types=["public.data"], allows_multiple_selection=False
+            file_types=["public.text"], allows_multiple_selection=False
         )[0]
         xlsx_path = FilePickerPyto(
-            file_types=["public.data"], allows_multiple_selection=False
+            file_types=["org.openxmlformats.spreadsheetml.sheet"], allows_multiple_selection=False
         )[0]
     else:
         from FilePicker import GetFilePathByGUI
