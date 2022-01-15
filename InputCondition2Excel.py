@@ -1,8 +1,9 @@
-import os
 import platform
+import sys
 from datetime import datetime as dt
 
 import openpyxl
+from openpyxl.worksheet._read_only import ReadOnlyWorksheet
 from openpyxl.worksheet.worksheet import Worksheet
 
 
@@ -22,18 +23,28 @@ def ReadConditionCSV(file_path):
 
 
 def Input2Excel(file_path, data_dict, year_set):
-    xlsx_dir = os.path.dirname(file_path)
-    wb = openpyxl.load_workbook(xlsx_path, data_only=True)
-    sheet_list = wb.sheetnames
+    wb = openpyxl.load_workbook(xlsx_path)
+    read_only_wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+    sheet_list = read_only_wb.sheetnames
     ws_header_cnt = 2
+    ws: Worksheet
+    read_only_ws: ReadOnlyWorksheet
+    for year in year_set:
+        if year not in sheet_list:
+            input(
+                f"{year}のシートがありません。以下の手順でシートを作成してください。\n"
+                f"・他のシートをコピーする\n"
+                f"・シート名を{year}に変更する\n"
+                f"・A1セルに{year}を入力する\n"
+                f"・体調データが入力されている場合はすべて削除する\n"
+                f"エンターを押すと終了します\n"
+            )
+            sys.exit()
+        ws = wb[year]
+        read_only_ws = read_only_wb[year]
 
-    for sheet_name in sheet_list:
-        if sheet_name not in year_set:
-            continue
-
-        ws: Worksheet = wb[sheet_name]
         for dt_cell, condition_cell, comment_cell in zip(
-            ws["A:A"][ws_header_cnt:],
+            read_only_ws["A:A"][ws_header_cnt:],
             ws["C:C"][ws_header_cnt:],
             ws["D:D"][ws_header_cnt:],
         ):
@@ -47,8 +58,9 @@ def Input2Excel(file_path, data_dict, year_set):
             )
             if len(data_list) > 1:
                 comment_cell.value = data_list[1]
-
-    wb.save(os.path.join(xlsx_dir, "test.xlsx"))
+    wb.save(xlsx_path)
+    wb.close()
+    read_only_wb.close()
 
 
 if __name__ == "__main__":
@@ -66,7 +78,6 @@ if __name__ == "__main__":
         )[0]
     else:
         from FilePicker import GetFilePathByGUI
-
         csv_path = GetFilePathByGUI(
             file_type=(["csvファイル", "*.csv"],),
         )[0]
