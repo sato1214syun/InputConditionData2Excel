@@ -1,13 +1,16 @@
 import platform
+import re
 import sys
 from datetime import datetime as dt
+from pathlib import Path
 
+import fire
 import openpyxl
 from openpyxl.worksheet._read_only import ReadOnlyWorksheet
 from openpyxl.worksheet.worksheet import Worksheet
 
 
-def ReadConditionCSV(file_path):
+def ReadConditionCSV(file_path: Path):
     with open(file_path, mode="r", encoding="utf8") as f:
         temp_data_list = f.readlines()
 
@@ -22,9 +25,9 @@ def ReadConditionCSV(file_path):
     return data_dict, year_set
 
 
-def Input2Excel(file_path, data_dict, year_set):
-    wb = openpyxl.load_workbook(xlsx_path)
-    read_only_wb = openpyxl.load_workbook(xlsx_path, data_only=True)
+def Input2Excel(file_path: Path, data_dict, year_set):
+    wb = openpyxl.load_workbook(file_path)
+    read_only_wb = openpyxl.load_workbook(file_path, data_only=True)
     sheet_list = read_only_wb.sheetnames
     ws_header_cnt = 2
     ws: Worksheet
@@ -58,32 +61,29 @@ def Input2Excel(file_path, data_dict, year_set):
             )
             if len(data_list) > 1:
                 comment_cell.value = data_list[1]
-    wb.save(xlsx_path)
+    wb.save(file_path)
     wb.close()
     read_only_wb.close()
 
 
-if __name__ == "__main__":
-    # iOSで動いているかの判定
-    is_iOS = False
-    if "iPhone" in platform.platform() or "iPad" in platform.platform():
-        is_iOS = True
-        from FilePickerPyto import FilePickerPyto
-
-        csv_path = FilePickerPyto(
-            file_types=["public.text"], allows_multiple_selection=False
-        )[0]
-        xlsx_path = FilePickerPyto(
-            file_types=["org.openxmlformats.spreadsheetml.sheet"], allows_multiple_selection=False
-        )[0]
-    else:
+def main(csv_path: str | None, xlsx_path: str | None):
+    if re.search(r"(iPhone|iPad)", platform.platform()):
         from FilePicker import GetFilePathByGUI
+
+    if not csv_path:
         csv_path = GetFilePathByGUI(
             file_type=(["csvファイル", "*.csv"],),
         )[0]
+
+    if not xlsx_path:
         xlsx_path = GetFilePathByGUI(
             file_type=(["xlsxファイル", "*.xlsx"],),
         )[0]
 
-    condition_data_dict, year_set = ReadConditionCSV(csv_path)
-    Input2Excel(xlsx_path, condition_data_dict, year_set)
+    condition_data_dict, year_set = ReadConditionCSV(Path(csv_path))
+    Input2Excel(Path(xlsx_path), condition_data_dict, year_set)
+    print("\n記録の入力が完了しました。")
+
+
+if __name__ == "__main__":
+    fire.Fire(main)

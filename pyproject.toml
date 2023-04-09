@@ -3,16 +3,14 @@ name = "inputconditiondata2excel"
 version = "0.1.0"
 description = ""
 authors = ["sato1214syun <sato1214syun@gmail.com>"]
+readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-openpyxl = "^3.0.9"
+python = "^3.11"
+openpyxl = "^3.1.2"
+fire = "^0.5.0"
 
-[tool.poetry.dev-dependencies]
-flake8 = "^4.0.1"
-mypy = "^0.931"
-black = {version = "^21.12b0", allow-prereleases = true}
 
 [build-system]
-requires = ["poetry-core>=1.0.0"]
+requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
