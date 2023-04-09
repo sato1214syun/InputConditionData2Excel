@@ -67,7 +67,7 @@ def Input2Excel(file_path: Path, data_dict, year_set):
 
 
 def main(csv_path: str | None, xlsx_path: str | None):
-    if re.search(r"(iPhone|iPad)", platform.platform()):
+    if not re.search(r"(iPhone|iPad)", platform.platform()):
         from FilePicker import GetFilePathByGUI
 
     if not csv_path:
