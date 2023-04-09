@@ -82,8 +82,8 @@ def main(csv_path: str | None, xlsx_path: str | None):
 
     condition_data_dict, year_set = ReadConditionCSV(Path(csv_path))
     Input2Excel(Path(xlsx_path), condition_data_dict, year_set)
-    print("\n記録の入力が完了しました。")
 
 
 if __name__ == "__main__":
     fire.Fire(main)
+    print("\n記録の入力が完了しました。")
